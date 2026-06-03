@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>亨利咖啡 Henry's Cafe - 尋找你的專屬咖啡密碼</title>
+    <style>
+        :root {
+            --henry-green: #1E3F30; /* 照片中的沉穩墨綠 */
+            --henry-gold: #D4AF37;  /* 奢華金邊金色 */
+            --henry-gold-dark: #AA7C11;
+            --henry-bg: #FAF6F0;    /* 復古米白紙張感 */
+            --henry-dark: #2A1A0A;  /* 深咖啡黑 */
+            --henry-card-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', 'Times New Roman', 'Noto Serif TC', 'PMingLiU', serif;
+        }
+
+        body {
+            background-color: var(--henry-bg);
+            color: var(--henry-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        /* 古典歐風金邊外框 */
+        .quiz-container {
+            background-color: var(--henry-card-bg);
+            max-width: 650px;
+            width: 100%;
+            padding: 50px 40px;
+            border-radius: 4px;
+            border: 12px double var(--henry-gold);
+            outline: 3px solid var(--henry-green);
+            outline-offset: -8px;
+            box-shadow: 0 15px 35px rgba(30, 63, 48, 0.15);
+            text-align: center;
+            position: relative;
+        }
+
+        /* 裝飾花紋 */
+        .quiz-container::before, .quiz-container::after {
+            content: "◆";
+            color: var(--henry-gold);
+            font-size: 1.2rem;
+            position: absolute;
+            width: 100%;
+            left: 0;
+        }
+        .quiz-container::before { top: 15px; }
+        .quiz-container::after { bottom: 15px; }
+
+        .logo-area {
+            color: var(--henry-green);
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid var(--henry-gold);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        h1 {
+            color: var(--henry-green);
+            font-size: 2rem;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .desc {
+            color: var(--henry-dark);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 35px;
+            font-style: italic;
+        }
+
+        /* 進度條 */
+        .progress-container {
+            width: 80%;
+            height: 4px;
+            background-color: #EFECE6;
+            border-radius: 2px;
+            margin: 0 auto 35px auto;
+            display: none;
+            border: 1px solid var(--henry-gold);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--henry-green);
+            transition: width 0.3s ease;
+        }
+
+        /* 古典紳士風按鈕 */
+        .btn {
+            background-color: var(--henry-green);
+            color: var(--henry-bg);
+            border: 1px solid var(--henry-gold);
+            padding: 14px 45px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            font-weight: bold;
+            border-radius: 0px; /* 方正復古感 */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 3px 3px 0px var(--henry-gold);
+        }
+
+        .btn:hover {
+            background-color: #2a5541;
+            color: #ffffff;
+            box-shadow: 1px 1px 0px var(--henry-gold);
+            transform: translate(2px, 2px);
+        }
+
+        /* 題卡與選項 */
+        .card {
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .question-title {
+            font-size: 1.35rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: var(--henry-green);
+            line-height: 1.6;
+            border-left: 4px solid var(--henry-gold);
+            padding-left: 15px;
+            text-align: left;
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .option-btn {
+            background-color: var(--henry-bg);
+            border: 1px solid var(--henry-gold);
+            color: var(--henry-dark);
+            padding: 16px 22px;
+            font-size: 1.05rem;
+            border-radius: 0px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            border-color: var(--henry-green);
+            background-color: var(--henry-green);
+            color: white;
+            padding-left: 30px;
+        }
+
+        /* 墨綠色結果面板 */
+        .result-view-box {
+            background-color: var(--henry-green);
+            color: var(--henry-bg);
+            padding: 30px;
+            border: 2px solid var(--henry-gold);
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .result-badge {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            color: var(--henry-gold);
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .result-subtitle {
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 25px;
+            opacity: 0.9;
+            border-bottom: 1px dashed var(--henry-gold);
+            padding-bottom: 15px;
+        }
+
+        .analysis-box {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        /* 經典菜單推薦卡 */
+        .menu-recommendation {
+            background-color: var(--henry-bg);
+            border: 2px solid var(--henry-gold);
+            color: var(--henry-dark);
+            padding: 25px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .menu-recommendation h3 {
+            color: var(--henry-green);
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--henry-green);
+            padding-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .menu-item-highlight {
+            font-size: 1.4rem;
+            color: #8A1C14; /* 經典紅棕大字 */
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-family: 'Microsoft JhengHei', sans-serif;
+        }
+
+        .roast-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 15px;
+        }
+        .roast-light { background-color: #A67B5B; }
+        .roast-medium { background-color: #6F4E37; }
+        .roast-dark { background-color: #3E2723; }
+
+        .feature-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .tag {
+            background-color: var(--henry-green);
+            color: white;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            font-family: 'Microsoft JhengHei', sans-serif;
+        }
+
+        .score-summary {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #7F8C8D;
+            text-align: left;
+            border-top: 1px solid #E0D4CC;
+            padding-top: 10px;
+            font-family: 'Microsoft JhengHei', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div id="start-view" class="card active">
+            <div class="logo-area">咖啡利亨</div>
+            <h1>亨利咖啡 Henry's Cafe</h1>
+            <p style="color:var(--henry-gold-dark); font-weight: bold; letter-spacing: 2px; margin-bottom: 15px;">— 風味密碼精心解鎖 —</p>
+            <p class="desc">
+                歡迎蒞臨亨利咖啡。<br>
+                我們依據店內經典菜單的「淺焙、中焙、深焙」黃金比例，<br>
+                為您準備了 10 道優雅的味覺直覺測驗。<br>
+                按下按鈕，即刻演算出最契合您靈魂的那一杯專屬特調。
+            </p>
+            <button class="btn" onclick="initQuiz()">開始風味測試</button>
+        </div>
+
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div id="quiz-view" class="card">
+            <div class="question-title" id="question-text">題目載入中...</div>
+            <div class="options-group" id="options-container">
+                </div>
+        </div>
+
+        <div id="result-view" class="card">
+            <div class="logo-area" style="margin-bottom: 20px;">亨利咖啡咖啡譜</div>
+            
+            <div class="result-view-box">
+                <div class="result-badge" id="res-badge">☕</div>
+                <div class="result-title" id="res-title">名流老船長</div>
+                <div class="result-subtitle" id="res-subtitle">焙度光譜：極致醇厚深焙型</div>
+                <div class="analysis-box" id="res-analysis">
+                    分析內容載入中...
+                </div>
+            </div>
+
+            <div class="menu-recommendation">
+                <h3>📜 亨利咖啡館・今日推薦席</h3>
+                <div class="menu-item-highlight" id="res-beans">老船長特濃冰滴咖啡</div>
+                <div id="res-roast-badge" class="roast-badge roast-dark">深焙 Deep Roast</div>
+                
+                <p><strong>建議享用方式：</strong> <span id="res-brew">冷萃滴濾，不加糖與奶</span></p>
+                <p style="margin-top: 10px;"><strong>預期核心風味調性：</strong></p>
+                <div class="feature-tags" id="res-tags">
+                    </div>
+            </div>
+
+            <p style="font-size:0.9rem; color:#888; margin-bottom: 20px; font-family: 'Microsoft JhengHei';">每人最低消費 100 元 | 店內晶緻咖啡豆 8 折優惠</p>
+
+            <button class="btn" onclick="resetQuiz()">重新測試 ↺</button>
+            
+            <div class="score-summary" id="score-summary"></div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 定義 10 道精密對應亨利菜單維度的生活化問題
+        const quizDatabase = [
+            {
+                question: "1. 悠閒的南台灣午後，您傾向挑選哪種飲品來陪伴時光？",
+                options: [
+                    { text: "清爽迷人、帶有鮮明果酸的現搾鮮檸檬紅茶", scores: { acid: 2, fruit: 2, roastType: 'light' } },
+                    { text: "口感滑順、香甜柔和的經典黑糖鮮奶茶", scores: { sweet: 2, body: 1, roastType: 'medium' } },
+                    { text: "沈穩乾淨、帶著濃郁烘焙香的純黑咖啡", scores: { bitter: 2, body: 2, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "2. 搭配咖啡的西式法式薄餅或甜點，哪一款最能吸引您的目光？",
+                options: [
+                    { text: "鋪滿繽紛新鮮莓果與茉莉花凍的法式水果塔", scores: { fruit: 2, acid: 1, roastType: 'light' } },
+                    { text: "微苦中帶有榛果與杏仁香氣的榛果巧克力薄餅", scores: { nut: 2, sweet: 1, roastType: 'medium' } },
+                    { text: "質地極致扎實、帶有醇厚酒香與厚可可的提拉米蘇", scores: { body: 2, bitter: 1, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "3. 拋開複雜的產區名字，您直覺希望手裡那杯咖啡喝起來整體感覺偏向？",
+                options: [
+                    { text: "如同高雅的東方清茶，明亮乾淨且充滿跳躍的花果香", scores: { acid: 2, fruit: 2, roastType: 'light' } },
+                    { text: "如絲綢般圓潤溫和，焦糖甜感在舌根徐徐回甘", scores: { sweet: 2, nut: 1, roastType: 'medium' } },
+                    { text: "如極致濃烈深邃的黑巧克力，餘韻沈穩、厚實且悠長", scores: { bitter: 2, body: 2, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "4. 日常料理或飲食中，您對柑橘類、百香果等「明亮酸質」的接受度如何？",
+                options: [
+                    { text: "相當享受！那種明亮、帶有生津感的清爽酸度能讓我精神一振", scores: { acid: 2, fruit: 1, roastType: 'light' } },
+                    { text: "適中溫和就好，更希望酸味能完美轉化為甘甜", scores: { sweet: 1, roastType: 'medium' } },
+                    { text: "偏好盡量避開酸度，我更著迷於飽滿、厚重且沈穩的醇苦風味", scores: { bitter: 2, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "5. 若走進一間復古木質調的香氛店，哪種氣味最能讓您感到放鬆？",
+                options: [
+                    { text: "剛切開的佛手柑、野莓與清新白茉莉的花果香", scores: { fruit: 2, acid: 1, roastType: 'light' } },
+                    { text: "壁爐旁剛烘烤出來的楓糖、炒堅果與香草烤布蕾甜香", scores: { nut: 2, sweet: 1, roastType: 'medium' } },
+                    { text: "成熟沈穩的雪松木、煙燻烏木與高純度可可煙草香", scores: { body: 2, bitter: 1, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "6. 對於咖啡中「果味明亮度」與「質地濃厚度」的天平，您更傾向哪一端？",
+                options: [
+                    { text: "我追求輕盈與高香氣，液體喝起來像水一樣優雅無負擔", scores: { fruit: 2, acid: 2, roastType: 'light' } },
+                    { text: "我喜歡扎實且有份量，質地在口腔裡要像濃牛奶般滑順", scores: { body: 2, bitter: 1, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "7. 在挑選日常精緻零食時，您的手指最常伸向哪一類？",
+                options: [
+                    { text: "酸甜多汁的水果乾、天然莓果蜜餞", scores: { fruit: 2, roastType: 'light' } },
+                    { text: "低溫烘焙的腰果、夏威夷豆或夏威夷堅果酥", scores: { nut: 2, roastType: 'medium' } },
+                    { text: "85% 以上、帶有高雅苦韻的純黑巧克力磚", scores: { bitter: 2, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "8. 想像一下您心目中完美的咖啡下午茶，它的背景配樂與畫面應該是？",
+                options: [
+                    { text: "陽光灑落在窗台草皮上，配上輕快優雅的古典花草交響樂", scores: { fruit: 1, acid: 1, roastType: 'light' } },
+                    { text: "微暗燈光下的歐式木桌，傳來黑膠唱片的溫暖焦糖爵士樂", scores: { nut: 1, sweet: 1, roastType: 'medium' } },
+                    { text: "深夜獨處的沉靜書房，流淌著低沉大提琴的哲學思考", scores: { body: 1, bitter: 1, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "9. 喝完熱飲過後數分鐘，您最希望在鼻腔與喉頭久久留存的「餘韻」是？",
+                options: [
+                    { text: "清脆、乾淨且帶有水果清新氣息的跳躍感", scores: { fruit: 2, roastType: 'light' } },
+                    { text: "炒焦糖、烤栗子與成熟蜂蜜交織的溫柔回甘", scores: { sweet: 2, nut: 1, roastType: 'medium' } },
+                    { text: "厚重煙燻、雪松藥草與濃郁苦甜巧克力的扎實餘香", scores: { bitter: 2, body: 1, roastType: 'dark' } }
+                ]
+            },
+            {
+                question: "10. 如果要在咖啡中鋪上厚厚一層奶泡或調製香料，您的看法是？",
+                options: [
+                    { text: "我很喜歡！那樣的奶香能帶出極佳的醇厚度與絲滑口感", scores: { body: 1, sweet: 1, roastType: 'medium' } },
+                    { text: "不，我堅持單品與黑咖啡，純粹的焙度才能彰顯食材本質", scores: { bitter: 1, acid: 1, roastType: 'dark' } }
+                ]
+            }
+        ];
+
+        // 2. 初始化計分變數
+        let currentIdx = 0;
+        let userScores = { acid: 0, bitter: 0, sweet: 0, body: 0, fruit: 0, nut: 0 };
+        let roastScores = { light: 0, medium: 0, dark: 0 }; // 焙度直接統計
+
+        // 3. 測驗初始化
+        function initQuiz() {
+            document.getElementById('start-view').style.display = 'none';
+            document.getElementById('quiz-view').style.display = 'block';
+            document.getElementById('progress-container').style.display = 'block';
+            currentIdx = 0;
+            userScores = { acid: 0, bitter: 0, sweet: 0, body: 0, fruit: 0, nut: 0 };
+            roastScores = { light: 0, medium: 0, dark: 0 };
+            renderQuestion();
+        }
+
+        // 4. 渲染當前題目
+        function renderQuestion() {
+            const percent = (currentIdx / quizDatabase.length) * 100;
+            document.getElementById('progress-bar').style.width = percent + '%';
+
+            const currentQ = quizDatabase[currentIdx];
+            document.getElementById('question-text').innerText = currentQ.question;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = ''; 
+
+            currentQ.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => selectOption(opt.scores);
+                container.appendChild(btn);
+            });
+        }
+
+        // 5. 處理選擇並累加分數
+        function selectOption(scores) {
+            // 累加風味分數
+            for (let trait in scores) {
+                if (userScores.hasOwnProperty(trait)) {
+                    userScores[trait] += scores[trait];
+                }
+            }
+            // 累加焙度權重
+            if (scores.roastType) {
+                roastScores[scores.roastType] += 2;
+            }
+
+            currentIdx++;
+
+            if (currentIdx < quizDatabase.length) {
+                renderQuestion();
+            } else {
+                processAndShowResult();
+            }
+        }
+
+        // 6. 核心演算法：融入烘培度偏好與亨利經典菜單推薦
+        function processAndShowResult() {
+            document.getElementById('quiz-view').style.display = 'none';
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('result-view').style.display = 'block';
+
+            // 格式化輸出各項得分（數據透明化）
+            document.getElementById('score-summary').innerHTML = `
+                <strong>亨利調試數據：</strong> 
+                淺焙偏好: ${roastScores.light} | 中焙偏好: ${roastScores.medium} | 深焙偏好: ${roastScores.dark}<br>
+                風味細項 - 酸度: ${userScores.acid} | 苦味: ${userScores.bitter} | 甜感: ${userScores.sweet} | 
+                厚度: ${userScores.body} | 花果: ${userScores.fruit} | 堅果巧克力: ${userScores.nut}
+            `;
+
+            // 判斷最高烘焙度偏好
+            let maxRoast = 'medium';
+            let maxRoastScore = roastScores.medium;
+
+            if (roastScores.light > maxRoastScore) { maxRoast = 'light'; maxRoastScore = roastScores.light; }
+            if (roastScores.dark > maxRoastScore) { maxRoast = 'dark'; maxRoastScore = roastScores.dark; }
+
+            // 如果淺、深分不出，用風味細項輔助微調
+            if (roastScores.light === roastScores.dark) {
+                if (userScores.fruit + userScores.acid > userScores.bitter + userScores.body) {
+                    maxRoast = 'light';
+                } else {
+                    maxRoast = 'dark';
+                }
+            }
+
+            // 依據最高烘焙度偏好，將推薦結果精準分流融入菜單
+            if (maxRoast === 'light') {
+                renderResultDetails({
+                    badge: "🍋",
+                    title: "浪漫的花果探索家",
+                    subtitle: "焙度光譜：精品高香淺焙型 (Light Roast)",
+                    analysis: `完成問卷後比較各項分數，您的<b>花果香氣</b>與<b>明亮酸度</b>極高。您擁有一對極致敏銳的老饕味蕾，排斥沉悶的焦苦味，最適合透過極淺烘焙，品嚐咖啡豆如同新鮮水果茶般的精緻柑橘花香。`,
+                    beans: "加勒比海 牙買加 藍山 (Jamaica Blue Mt. Wallenford)",
+                    brew: "精緻手沖 / 冰鮮單品萃取 (完美綻放高雅明亮微酸質)",
+                    roastClass: "roast-light",
+                    roastText: "淺焙 Light Roast",
+                    tags: ["牙買加藍山特選", "茉莉花香", "明亮柑橘酸質", "豐富莓果乾淨餘韻"]
+                });
+            } else if (maxRoast === 'dark') {
+                renderResultDetails({
+                    badge: "🪵",
+                    title: "沈穩的名流老船長",
+                    subtitle: "焙度光譜：經典醇厚深焙型 (Dark Roast)",
+                    analysis: `綜合數據顯示，您的<b>苦味韻味</b>與<b>口感醇厚度（Body）</b>得分最高。您偏好沉穩扎實的紳士調性，輕飄飄的花果酸無法滿足您，您渴望的是滑過喉嚨那份極致厚重、帶著沉穩木質與煙燻苦甜巧克力的靈魂重焙。`,
+                    beans: "老船長特濃冰滴咖啡 (Old Captain's strong ice coffee)",
+                    brew: "經典長效冰滴滴濾 / 法式濾壓 (低酸且餘韻雄渾悠長)",
+                    roastClass: "roast-dark",
+                    roastText: "深焙 Deep Roast",
+                    tags: ["老船長經典代表", "極致濃厚 Body", "沉穩雪松草本香", "經典回甘苦甜巧克力"]
+                });
+            } else {
+                renderResultDetails({
+                    badge: "🍫",
+                    title: "優雅的焦糖調和大師",
+                    subtitle: "焙度光譜：溫和平衡中焙型 (Medium Roast)",
+                    analysis: `根據計分系統分析，您的風味指標落點於最優雅的「平衡點」。您不喜歡過度刺激的果酸，也排斥太重口的焦苦，最注重咖啡天然轉化出來的<b>堅果巧克力風味</b>與<b>溫和焦糖甜感</b>。`,
+                    beans: "哥倫比亞 聖德阿利奧歐特園 (Columbia Santuario Farm)",
+                    brew: "賽風壺 (Syphon) 烹煮 / 蛋糕濾杯手沖 (呈現細緻滑順與焦糖飽滿度)",
+                    roastClass: "roast-medium",
+                    roastText: "中焙 Medium Roast",
+                    tags: ["南美洲精品波旁", "烘焙榛果與烤栗子", "迷人焦糖香甜", "細緻黑巧克力滑順"]
+                });
+            }
+        }
+
+        // 7. 將結果內容動態替換到 DOM 網頁上
+        function renderResultDetails(data) {
+            document.getElementById('res-badge').innerText = data.badge;
+            document.getElementById('res-title').innerText = data.title;
+            document.getElementById('res-subtitle').innerText = data.subtitle;
+            document.getElementById('res-analysis').innerHTML = data.analysis;
+            document.getElementById('res-beans').innerText = data.beans;
+            document.getElementById('res-brew').innerText = data.brew;
+
+            // 更新烘焙標籤樣式
+            const roastBadge = document.getElementById('res-roast-badge');
+            roastBadge.className = `roast-badge ${data.roastClass}`;
+            roastBadge.innerText = data.roastText;
+
+            const tagsContainer = document.getElementById('res-tags');
+            tagsContainer.innerHTML = '';
+            data.tags.forEach(tagText => {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.innerText = tagText;
+                tagsContainer.appendChild(span);
+            });
+        }
+
+        // 8. 重新測驗
+        function resetQuiz() {
+            document.getElementById('result-view').style.display = 'none';
+            document.getElementById('start-view').style.display = 'block';
+            document.getElementById('score-summary').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
